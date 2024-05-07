@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Приложение для оценки эссе</title>
+    <style>
+        .submit-button {
+          float: left;
+          padding-left: 145px;
+        }
+    </style>
+</head>
+<body>
+<h1>Приложение для оценки эссе</h1>
+<form method="post" enctype="multipart/form-data">
+    <label for="author">Введите имя автора эссе:</label>
+    <input type="text" name="author" id="author" required><br><br>
+    <label for="essay_file">Загрузите файл эссе:</label>
+    <input type="file" name="essay_file" id="essay_file" required><br><br>
+    <div class="submit-button"><input type="submit" value="Добавить"></div>
+</form>
+<br><br>
+<a href="/view">Посмотреть все эссе</a>
+</body>
+</html>

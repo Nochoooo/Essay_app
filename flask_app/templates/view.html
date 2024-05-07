@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Просмотр записей в базе данных</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #acf;
+        }
+        .selected {
+            background-color: orange;
+        }
+        .red-text { color: red; }
+        .blue-text { color: blue; }
+        .green-text { color: green; }
+    </style>
+    <style>
+        .edit {
+          display: none;
+        }
+    </style>
+    <script>
+        // Функция для создания текстового поля для редактирования
+        function createInput(value) {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = value;
+          return input;
+        }
+
+        // Функция для обработки двойного клика по ячейке "Оценка"
+        function onScoreDoubleClick(td) {
+          const essayId = td.parentElement.dataset.id; // Получаем ID эссе
+          const input = document.createElement('input');
+          input.type = 'number'; // Используем тип 'number' для ввода чисел
+          input.min = '0'; // Минимальное значение оценки
+          input.max = '10'; // Максимальное значение оценки
+          input.value = td.innerText;
+          td.innerText = '';
+          td.appendChild(input);
+          input.focus();
+
+          // Кнопка для подтверждения изменений
+          const confirmButton = document.createElement('button');
+          confirmButton.innerText = 'Редактировать';
+          confirmButton.onclick = function() {
+            const newScore = parseFloat(input.value);
+            if (newScore >= 0 && newScore <= 10) {
+              updateScore(essayId, newScore);
+              td.removeChild(input); // Удалить поле ввода
+              td.removeChild(confirmButton); // Удалить кнопку
+            } else {
+              alert('Оценка должна быть числом от 0 до 10.');
+              input.focus();
+            }
+          };
+          td.appendChild(confirmButton);
+        }
+
+        // Функция для отправки обновленной оценки на сервер
+        function updateScore(essayId, score) {
+          fetch('/update_score', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: essayId, score: score }),
+          }).then(response => {
+            if (response.ok) {
+              window.location.reload();
+            }
+          });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+          // Навешиваем событие на все ячейки "Оценка"
+          const scoreCells = document.querySelectorAll('.score-cell');
+          scoreCells.forEach(cell => {
+            cell.addEventListener('dblclick', function() {
+              onScoreDoubleClick(cell);
+            });
+          });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const rows = document.querySelectorAll('table tr');
+          rows.forEach(row => {
+            row.addEventListener('click', function() {
+              this.classList.toggle('selected');
+              updateDeleteButton();
+            });
+          });
+
+          function updateDeleteButton() {
+            const selectedRows = document.querySelectorAll('.selected');
+            const deleteButton = document.getElementById('delete-button');
+            if (selectedRows.length > 0) {
+              deleteButton.style.display = 'block';
+            } else {
+              deleteButton.style.display = 'none';
+            }
+          }
+        });
+
+          function deleteSelectedRows() {
+            const selectedRows = document.querySelectorAll('.selected');
+            const idsToDelete = Array.from(selectedRows).map(row => parseInt(row.dataset.id, 10));
+
+            fetch('/delete', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ ids: idsToDelete }),
+            }).then(response => {
+              if (response.ok) {
+                window.location.reload();
+              } else {
+                response.text().then(text => alert(text));
+              }
+            });
+          }
+    </script>
+</head>
+<body>
+<h1>Эссе в базе данных</h1>
+<a href="/">Назад</a><br><br>
+<table border="1">
+    <tr>
+        <th>Автор</th>
+        <th>Содержание</th>
+        <th>Оценка</th>
+    </tr>
+    {% for essay in essays %}
+    <tr data-id="{{ essay['id'] }}">
+        <td>{{ essay['author'] }}</td>
+        <td>{{ essay['content'] }}</td>
+        <td class="score-cell {{ 'red-text' if essay['score'] <= 3 else 'blue-text' if 4 <= essay['score'] <= 6 else 'green-text' }}"
+            ondblclick="makeScoreEditable(this)">{{ essay['score'] }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<button id="delete-button" style="display:none;" onclick="deleteSelectedRows()">Удалить</button>
+</body>
+</html>
