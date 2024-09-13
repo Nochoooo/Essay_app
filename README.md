@@ -14,7 +14,7 @@ ___
   <a href="https://github.com/Nochoooo/Essay_app/blob/master/README.md#Информация-о-данных">6. Информация о данных</a><br>
   <a href="https://github.com/Nochoooo/Essay_app/blob/master/README.md#Структура-проекта">7. Структура проекта</a><br>
   <a href="https://github.com/Nochoooo/Essay_app/blob/master/README.md#Инструкции-по-запуску">8. Инструкции по запуску</a><br>
-  <a href="https://github.com/Nochoooo/Essay_app/blob/master/README.md#Результат">9. Результаты</a>
+  <a href="https://github.com/Nochoooo/Essay_app/blob/master/README.md#Результаты">9. Результаты</a>
 </div>
 
 ---
